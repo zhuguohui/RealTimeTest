@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en" ng-app="realTimeModule">
+
+<head>
+    <meta charset="UTF-8">
+    <title>realtime</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+    <script src="./js/av.js"></script>
+    <script src="./js/realtime.browser.min.js"></script>
+    <script src="./js/typed-messages.min.js"></script>
+    <script src="./js/angular.js"></script>
+    
+    <style>
+    * {
+        padding: 0;
+        margin: 0;
+    }
+    
+    html {
+        -webkit-text-size-adjust: none;
+        font-size: 10px;
+    }
+    
+    body {
+        font-family: "Microsoft Yahei";
+    }
+    
+    ul li {
+        list-style: none;
+    }
+    
+    @media screen and (min-width:1024px) {
+        .chatroom-header {
+            height: 4rem;
+            line-height: 4rem;
+            text-align: center;
+            color: red;
+            font-weight: bold;
+            font-size: 2rem;
+            border-bottom: 2px solid #ccc;
+            box-shadow: 0 0 5px #ccc;
+        }
+        .chatroom {
+            height: 32rem;
+            overflow-y: auto;
+            margin: 0 auto 6rem;
+        }
+        .chatroom p {
+            font-size: 1.6rem;
+            margin: 1rem 0;
+            color: #666;
+        }
+        .chatroom p.linking,
+        .chatroom p.linked,
+        .chatroom p.relink {
+            text-align: center;
+        }
+        .chatroom .history {}
+        .chatroom .history p {
+            overflow: hidden;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 1rem;
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+        .chatroom .history p span {}
+        .chatroom .history p img {
+            width: 6%;
+            vertical-align: middle;
+        }
+        .chatroom .history p span.time {
+            display: inline-block;
+            /* width: 20%; */
+            font-size: 1.6rem;
+        }
+        .chatroom .history p span.from {}
+        .chatroom .history p span.text {
+            color: #000;
+            font-weight: bold;
+            font-size: 1.8rem;
+            word-break:break-all;
+        }
+        .chatroom .my-msg {
+            overflow: hidden;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 1rem;
+            padding-left: 10%;
+        }
+        .chatroom .my-msg img {
+            width: 6%;
+            vertical-align: middle;
+        }
+        .chatroom .my-msg span.name {
+            font-size: 1.6rem;
+            color: #666;
+        }
+        .chatroom .my-msg span.text {
+            color: #000;
+            font-weight: bold;
+            font-size: 1.8rem;
+        }
+        .send-box {
+            overflow: hidden;
+            background: #ccc;
+            border-top: 2px solid #aaa;
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+        }
+        .send-box .content-text {
+            position: relative;
+            float: left;
+            width: 70%;
+            height: 4rem;
+            margin-left: 8%;
+            margin-right: 2%;
+        }
+        .send-box .content-text i {
+            position: absolute;
+            display: block;
+            left: 1rem;
+            top: 0.5rem;
+            background: url(./images/editButton@3x.png) no-repeat;
+            width: 3rem;
+            height: 3rem;
+            background-size: cover;
+        }
+        .send-box input[type="text"] {
+            width: 95%;
+            height: 4rem;
+            line-height: 4rem;
+            border-radius: 30px;
+            /* border: 1px solid #ccc; */
+            color: #999;
+            padding-left: 4rem;
+            font-size: 1.8rem;
+            outline: none;
+            border: none;
+            font-family: "Microsoft Yahei";
+        }
+        .send-box .send-btn {
+            width: 4rem;
+            height: 4rem;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-block;
+            vertical-align: -0.6rem;
+        }
+        .send-box input[type="button"] {
+            width: 3rem;
+            background: url(./images/shareButton@3x.png) no-repeat;
+            height: 3rem;
+            border: none;
+            background-size: cover;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            margin-top: 0.2rem;
+            outline: none;
+        }
+    }
+    
+    @media screen and (max-width:1024px) and (min-width:768px) {
+        .chatroom-header {
+            height: 3rem;
+            line-height: 3rem;
+            text-align: center;
+            color: red;
+            font-weight: bold;
+            font-size: 1.6rem;
+            border-bottom: 2px solid #ccc;
+            box-shadow: 0 0 5px #ccc;
+        }
+        .chatroom {
+            height: 32rem;
+            overflow-y: auto;
+            margin: 0 auto 5rem;
+        }
+        .chatroom p {
+            font-size: 1.4rem;
+            margin: 1rem 0;
+            color: #666;
+        }
+        .chatroom p.linking,
+        .chatroom p.linked,
+        .chatroom p.relink {
+            text-align: center;
+        }
+        .chatroom .history {}
+        .chatroom .history p {
+            overflow: hidden;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 1rem;
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+        .chatroom .history p span {}
+        .chatroom .history p img {
+            width: 6%;
+            vertical-align: middle;
+        }
+        .chatroom .history p span.time {
+            display: inline-block;
+            /* width: 20%; */
+            font-size: 1.4rem;
+        }
+        .chatroom .history p span.from {}
+        .chatroom .history p span.text {
+            color: #000;
+            font-weight: bold;
+            font-size: 1.5rem;
+            word-break:break-all;
+        }
+        .chatroom .my-msg {
+            overflow: hidden;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 1rem;
+            padding-left: 10%;
+        }
+        .chatroom .my-msg img {
+            width: 6%;
+            vertical-align: middle;
+        }
+        .chatroom .my-msg span.name {
+            font-size: 1.6rem;
+            color: #666;
+        }
+        .chatroom .my-msg span.text {
+            color: #000;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        .send-box {
+            overflow: hidden;
+            background: #ccc;
+            border-top: 2px solid #aaa;
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+        }
+        .send-box .content-text {
+            position: relative;
+            float: left;
+            width: 70%;
+            height: 3rem;
+            margin-left: 8%;
+        }
+        .send-box .content-text i {
+            position: absolute;
+            display: block;
+            left: 1rem;
+            top: 0.5rem;
+            background: url(./images/editButton@3x.png) no-repeat;
+            width: 2rem;
+            height: 2rem;
+            background-size: cover;
+        }
+        .send-box input[type="text"] {
+            width: 90%;
+            height: 3rem;
+            line-height: 3rem;
+            border-radius: 30px;
+            /* border: 1px solid #ccc; */
+            color: #999;
+            padding-left: 3rem;
+            font-size: 1.6rem;
+            outline: none;
+            border: none;
+            font-family: "Microsoft Yahei";
+        }
+        .send-box .send-btn {
+            width: 3rem;
+            height: 3rem;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-block;
+            vertical-align: -0.6rem;
+        }
+        .send-box input[type="button"] {
+            width: 2rem;
+            background: url(./images/shareButton@3x.png) no-repeat;
+            height: 2rem;
+            border: none;
+            background-size: cover;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            margin-top: 0.2rem;
+            outline: none;
+        }
+    }
+    
+    @media screen and (max-width:768px) and (min-width:320px) {
+        .chatroom-header {
+            height: 2.4rem;
+            line-height: 2.4rem;
+            text-align: center;
+            color: red;
+            font-weight: bold;
+            font-size: 1.4rem;
+            border-bottom: 2px solid #ccc;
+            box-shadow: 0 0 5px #ccc;
+        }
+        .chatroom {
+            height: 32rem;
+            overflow-y: auto;
+            margin: 0 auto 4rem;
+        }
+        .chatroom p {
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            color: #666;
+        }
+        .chatroom p.linking,
+        .chatroom p.linked,
+        .chatroom p.relink {
+            text-align: center;
+        }
+        .chatroom .history {}
+        .chatroom .history p {
+            overflow: hidden;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 1rem;
+            padding-left: 10%;
+            padding-right: 10%;
+        }
+        .chatroom .history p span {}
+        .chatroom .history p img {
+            width: 6%;
+            vertical-align: middle;
+        }
+        .chatroom .history p span.time {
+            display: inline-block;
+            /* width: 20%; */
+            font-size: 1.2rem;
+        }
+        .chatroom .history p span.from {}
+        .chatroom .history p span.text {
+            color: #000;
+            font-weight: bold;
+            font-size: 1.3rem;
+            word-break:break-all;
+        }
+        .chatroom .my-msg {
+            overflow: hidden;
+            border-bottom: 1px dotted #ccc;
+            padding-bottom: 1rem;
+            padding-left: 10%;
+        }
+        .chatroom .my-msg img {
+            width: 6%;
+            vertical-align: middle;
+        }
+        .chatroom .my-msg span.name {
+            font-size: 1.3rem;
+            color: #666;
+        }
+        .chatroom .my-msg span.text {
+            color: #000;
+            font-weight: bold;
+            font-size: 1.3rem;
+        }
+        .send-box {
+            overflow: hidden;
+            background: #ccc;
+            border-top: 2px solid #aaa;
+            padding: 0.7rem 0;
+            position: fixed;
+            bottom: 0px;
+            left: 0px;
+            width: 100%;
+        }
+        .send-box .content-text {
+            position: relative;
+            float: left;
+            width: 70%;
+            height: 2rem;
+            margin-left: 8%;
+        }
+        .send-box .content-text i {
+            position: absolute;
+            display: block;
+            left: 1rem;
+            top: 0.5rem;
+            background: url(./images/editButton@3x.png) no-repeat;
+            width: 1rem;
+            height: 1rem;
+            background-size: cover;
+        }
+        .send-box input[type="text"] {
+            width: 85%;
+            height: 2rem;
+            line-height: 2rem;
+            border-radius: 20px;
+            /* border: 1px solid #ccc; */
+            color: #999;
+            padding-left: 2rem;
+            font-size: 1.2rem;
+            outline: none;
+            border: none;
+            font-family: "Microsoft Yahei";
+        }
+        .send-box .send-btn {
+            width: 2rem;
+            height: 2rem;
+            border: 1px solid #aaa;
+            border-radius: 50%;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .send-box input[type="button"] {
+            width: 1rem;
+            background: url(./images/shareButton@3x.png) no-repeat;
+            height: 1rem;
+            border: none;
+            background-size: cover;
+            cursor: pointer;
+            margin-left: 0.5rem;
+            margin-top: 0.4rem;
+            outline: none;
+        }
+    }
+    </style>
+</head>
+
+<body ng-controller="realTimeCtrl">
+    <div id="player" style="width:100%;">
+        <script type="text/javascript" charset="utf-8" src="http://yuntv.letv.com/player/live/blive.js "></script>
+        <script>
+        var player = new CloudLivePlayer();
+        player.init({
+            activityId: "A2016101000001tl"
+        });
+        </script>
+    </div>
+    <p class="chatroom-header" id="chatroomHeader">聊天室</p>
+    <!-- <div style="text-align:center">
+        <span>您的昵称:</span>
+        <input type="text" value="" ng-model="status.clientId" />
+        <input type="button" value="连接服务器" ng-click="linkToServer()" ng-disabled="status.clientId==''">
+    </div> -->
+    <div class="chatroom" id="chatroom">
+        <!-- <p ng-if="status.isLinking" class="linking">正在连接服务器，请等待...</p>
+        <p ng-if="status.isLinkSuccess" class="linked">服务器连接成功</p>
+        <p ng-if="status.isLinkFailed" class="relink">服务器正在重连，请耐心等待...</p> -->
+        <!-- <div ng-if="status.isLinkSuccess">
+            <span>当前用户:</span>
+            <p>
+                <span ng-repeat="member in status.members">
+                    {{member}}
+                </span>
+            </p>
+        </div> -->
+
+        <div class="history">
+            <p ng-repeat="history in status.historys">
+                <!-- (
+                <span ng-bind="history.timestamp | date:'yyyy-MM-dd HH:mm:ss'" class="time"></span> ) -->
+                <img src="./images/default-face.png" />
+                <span ng-bind="history.from" class="from"></span>说:
+                <span ng-bind="history.text" class="text"></span>
+            </p>
+        </div>
+
+    </div>
+    <div class="send-box" id="sendBox">
+        <div class="content-text">
+            <i></i>
+            <input type="text" value="" ng-model="status.msg" ng-keypress="sendMessage($event)" placeholder="我来说两句">
+        </div>
+        <div class="send-btn">
+            <input type="button" ng-click="sendMessage()" ng-disabled="status.msg==''">
+        </div>
+    </div>
+    <script src="./js/realtime.js"></script>
+</body>
+
+</html>
